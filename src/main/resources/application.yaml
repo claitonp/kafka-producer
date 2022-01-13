@@ -7,11 +7,14 @@ server:
 spring:
   kafka:
     producer:
-      bootstrap-servers: 127.0.0.1:9092
+      bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    consumer:
-      group-id: group_id
+#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties: 
+        "spring.json.add.type.headers": false
+        "spring.json.trusted.packages": "*"
+
 
 # Topic name
 topic:
@@ -21,6 +24,6 @@ topic:
 # Common Kafka Properties
 auto:
   create:
-   topics:
-     enable: true
+    topics:
+      enable: true
 
