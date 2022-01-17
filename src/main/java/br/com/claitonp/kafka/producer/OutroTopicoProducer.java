@@ -13,43 +13,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import br.com.claitonp.kafka.model.User;
+import br.com.claitonp.kafka.model.Login;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TopicProducer {
+public class OutroTopicoProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
-
-    public void send(User user){
-    	user.setDh(LocalDateTime.now());
-        log.info("Payload enviado: {}", user);
-        ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send(topicName, user.getLogin(), user);
-        
-        future.addCallback(new ListenableFutureCallback<SendResult<String, Object>>() {
-
-            @Override
-            public void onSuccess(SendResult<String, Object> result) {
-                System.out.println("Sent message=[" + user + "] with offset=[" + result.getRecordMetadata().offset() + "]");
-            }
-            
-            @Override
-            public void onFailure(Throwable ex) {
-                System.out.println("Unable to send message=[" + user + "] due to : " + ex.getMessage());
-            }
-        });
-    }
     
-    @Value("${topic.name.producer}")
-    private String topicName;
-
+    @Value("${kafka.topic.outrotopico}")
+    private String outroTopico;
+    
     @Bean
-    public NewTopic adviceTopic() {
-//        return new NewTopic(topicName, 3, (short) 1);
-        return TopicBuilder.name(topicName)
+    public NewTopic outroTopico() {
+        return TopicBuilder.name(outroTopico)
         	      .partitions(3)
         	      .replicas(1)
         	      .compact()
@@ -57,6 +37,14 @@ public class TopicProducer {
                   .config(TopicConfig.SEGMENT_MS_CONFIG, "100")
                   .config(TopicConfig.MIN_CLEANABLE_DIRTY_RATIO_CONFIG, "0.01")
         	      .build();
+    }
+
+    
+    public void sendLogin(Login login){
+    	login.setDh(LocalDateTime.now());
+        ListenableFuture<SendResult<String, Object>> future = kafkaTemplate.send(outroTopico, login.getLogin(), login);
+        
+        future.addCallback(new ProducerCallback());
     }
 
 }

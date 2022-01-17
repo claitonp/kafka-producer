@@ -6,24 +6,25 @@ server:
 # Kafka Producer properties
 spring:
   kafka:
+    properties:
+      '[request.timeout.ms]': 1000
+      '[default.api.timeout.ms]': 1000
+      '[transaction.timeout.ms]': 1000
     producer:
       bootstrap-servers: localhost:9092
+      retries: 5
+      acks: 1
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties: 
-        "spring.json.add.type.headers": false
-        "spring.json.trusted.packages": "*"
+        '[transaction.timeout.ms]': 1000
+        '[max.block.ms]': 1000
+        '[spring.json.add.type.headers]': false  # para jsonSerializer importante este atributo
+#        "spring.json.trusted.packages": "*"
 
 
-# Topic name
-topic:
-  name:
-    producer: meutopico
-
-# Common Kafka Properties
-auto:
-  create:
-    topics:
-      enable: true
+kafka:
+  topic:
+    meutopico: meutopico
+    outrotopico: outrotopico
 
